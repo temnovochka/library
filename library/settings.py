@@ -14,8 +14,6 @@ import os
 
 from celery.schedules import crontab
 
-from library.local_settings import *
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -75,15 +73,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'library.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+
+
+def read_secret(secret_name: str):
+    with open('/run/secrets/{}'.format(secret_name)) as f:
+        return f.read()
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
+        'NAME': 'library',
+        'USER': read_secret('postgres_user_name'),
+        'PASSWORD': read_secret('postgres_password'),
         'HOST': '',
         'PORT': '',
     }
