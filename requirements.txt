@@ -3,4 +3,7 @@ djangorestframework==3.11
 psycopg2-binary==2.8.5
 drf-yasg==1.17.1
 django-post_office==3.4.1
-uwsgidecorators==1.1.0
+celery==4.4.6
+redis==3.5.3
+gevent==20.6.2
+gunicorn==20.0.4

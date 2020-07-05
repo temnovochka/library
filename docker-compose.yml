@@ -1,0 +1,63 @@
+version: '3'
+
+volumes:
+    pgdata:
+        driver: local
+services:
+    nginx:
+        restart: always
+        image: nginx:latest
+        expose:
+            - 8080
+        ports:
+            - "80:8080"
+        volumes:
+            - ./static:/srv/www/library/static
+            - ./media:/srv/www/library/media
+            - ./logs:/srv/www/library/logs
+            - ./docker/nginx:/etc/nginx/conf.d
+        depends_on:
+            - python
+    python:
+        restart: always
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - .:/srv/www/library
+        expose:
+            - 8000
+        ports:
+            - 8000:8000
+        command: "manage.py migrate --noinput && gunicorn -c gunicorn.py library.wsgi"
+        depends_on:
+            - postgres
+    redis:
+        image: "redis:alpine"
+    celery:
+        build: .
+        command: celery -A library worker -l info
+        volumes:
+            - .:.
+        depends_on:
+            - redis
+            - python
+    celery-beat:
+        build: .
+        command: celery -A library beat -l info
+        volumes:
+            - .:.
+        depends_on:
+            - redis
+            - python
+    postgres:
+        image: postgres:12.3
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_USER: test
+            POSTGRES_PASSWORD: test
+            POSTGRES_DB: test
+            PGDATA: /var/lib/postgresql/data
+        volumes:
+            - pgdata:/var/lib/postgresql/data
