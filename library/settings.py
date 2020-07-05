@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+from celery.schedules import crontab
+
 from library.local_settings import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -121,6 +123,18 @@ USE_TZ = True
 EMAIL_BACKEND = 'post_office.EmailBackend'
 
 LIBRARY_EMAIL = 'notification@library.ru'
+
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_BEAT_SCHEDULE = {
+    'send-queued-mail': {
+        'task': 'post_office.tasks.send_queued_mail',
+        'schedule': crontab(minute=10),
+    },
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
