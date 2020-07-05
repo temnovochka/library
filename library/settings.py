@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'library_api',
     'drf_yasg',
+    'post_office',
 ]
 
 MIDDLEWARE = [
@@ -116,6 +117,10 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+EMAIL_BACKEND = 'post_office.EmailBackend'
+
+LIBRARY_EMAIL = 'notification@library.ru'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
