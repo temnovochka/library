@@ -29,7 +29,7 @@ services:
             - 8000
         ports:
             - 8000:8000
-        command: "manage.py migrate --noinput && gunicorn -c gunicorn.py library.wsgi"
+        command: bash -c "manage.py migrate --noinput && gunicorn -c gunicorn.py library.wsgi"
         depends_on:
             - postgres
     redis:
@@ -38,7 +38,7 @@ services:
         build: .
         command: celery -A library worker -l info
         volumes:
-            - .:.
+            - .:/srv/celery
         depends_on:
             - redis
             - python
@@ -46,14 +46,12 @@ services:
         build: .
         command: celery -A library beat -l info
         volumes:
-            - .:.
+            - .:/srv/celery-beat
         depends_on:
             - redis
             - python
     postgres:
         image: postgres:12.3
-        ports:
-            - 5432:5432
         environment:
             POSTGRES_USER: test
             POSTGRES_PASSWORD: test
