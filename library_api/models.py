@@ -2,14 +2,14 @@ from django.db import models
 
 
 class Language(models.Model):
-    name = models.CharField(verbose_name='Название', max_length=255)
+    name = models.CharField(verbose_name='Название', max_length=255, primary_key=True)
 
 
 class Book(models.Model):
     name = models.CharField(verbose_name='Название', max_length=255)
-    language = models.ManyToManyField(Language, related_name='books', related_query_name='book')
+    languages = models.ManyToManyField(Language, related_name='books', related_query_name='book')
     year = models.IntegerField(verbose_name='Год публикации')
-    author = models.ManyToManyField('Author', related_name='books', related_query_name='book')
+    authors = models.ManyToManyField('Author', related_name='books', related_query_name='book', blank=True)
 
 
 class Person(models.Model):
