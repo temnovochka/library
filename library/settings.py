@@ -24,9 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'zp=dm_fwp&ssc&%4%+k#c9dn29dv#rl7cx+fd=!nh@e_hyfr(o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -86,11 +86,11 @@ def read_secret(secret_name: str):
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'library',
+        'NAME': read_secret('postgres_user_name'),
         'USER': read_secret('postgres_user_name'),
         'PASSWORD': read_secret('postgres_password'),
-        'HOST': '',
-        'PORT': '',
+        'HOST': 'postgres',
+        'PORT': '5432',
     }
 }
 
@@ -145,3 +145,4 @@ CELERY_BEAT_SCHEDULE = {
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static/'

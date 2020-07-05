@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 volumes:
     pgdata:
@@ -15,7 +15,7 @@ services:
             - ./static:/srv/www/library/static
             - ./media:/srv/www/library/media
             - ./logs:/srv/www/library/logs
-            - ./docker/nginx:/etc/nginx/conf.d
+            - ./nginx:/etc/nginx/conf.d
         depends_on:
             - python
     python:
@@ -29,7 +29,7 @@ services:
             - 8000
         ports:
             - 8000:8000
-        command: bash -c "manage.py migrate --noinput && gunicorn -c gunicorn.py library.wsgi"
+        command: bash -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn -c gunicorn.py library.wsgi"
         depends_on:
             - postgres
         secrets:
@@ -58,15 +58,14 @@ services:
         environment:
             - POSTGRES_USER_FILE=/run/secrets/postgres_user_name
             - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
-            - POSTGRES_DB=library
             - PGDATA=/var/lib/postgresql/data
         volumes:
             - pgdata:/var/lib/postgresql/data
         secrets:
             - postgres_user_name
             - postgres_password
-    secrets:
-        postgres_user_name:
-            file: secrets/postgres_user_name.txt
-        postgres_password:
-            file: secrets/postgres_password.txt
+secrets:
+    postgres_user_name:
+        file: secrets/postgres_user_name.txt
+    postgres_password:
+        file: secrets/postgres_password.txt
