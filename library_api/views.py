@@ -1,15 +1,13 @@
-from django.conf import settings
 from django.db import models
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from post_office import mail
 from rest_framework import viewsets, generics, filters
 from rest_framework.exceptions import ValidationError
-from rest_framework.status import HTTP_201_CREATED
 
 from library_api import models as library_models
 from library_api import serializers
+from library_api.mail import notify_all_new_book
 
 
 class LanguageViewSet(viewsets.ModelViewSet):
@@ -21,16 +19,9 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BookSerializer
     queryset = library_models.Book.objects.all()
 
-    def create(self, request, *args, **kwargs):
-        response = super(BookViewSet, self).create(request, *args, **kwargs)
-        if response.status_code == HTTP_201_CREATED:
-            mail.send(
-                list(library_models.Follower.objects.values_list('email', flat=True)),
-                settings.LIBRARY_EMAIL,
-                subject='New book is allowed',
-                message='Book name: {}'.format(response.data['name']),
-            )
-        return response
+    def perform_create(self, serializer):
+        book = serializer.save()
+        notify_all_new_book(book)
 
 
 class AuthorViewSet(viewsets.ModelViewSet):

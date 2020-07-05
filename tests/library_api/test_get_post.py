@@ -2,7 +2,7 @@ import pytest
 from rest_framework.test import APIClient
 
 
-def test_basic(obj, path):
+def _query_api(obj, path):
     client = APIClient()
 
     post_response = client.post('/api/{}/'.format(path), obj)
@@ -19,11 +19,11 @@ def test_basic(obj, path):
 def test_book_api():
     path = 'book'
     obj = {'name': 'Harry Potter', 'year': 2015, 'languages': ['ENG'], 'authors': []}
-    test_basic(obj, path)
+    _query_api(obj, path)
 
 
 @pytest.mark.django_db
 def test_follower_api():
     path = 'follower'
     obj = {'email': 'a@a.ru', 'last_name': 'a', 'first_name': 'b', 'middle_name': 'c'}
-    test_basic(obj, path)
+    _query_api(obj, path)

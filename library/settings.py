@@ -24,7 +24,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'zp=dm_fwp&ssc&%4%+k#c9dn29dv#rl7cx+fd=!nh@e_hyfr(o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+RUNTIME_ENV = os.environ.get('RUNTIME_ENV', 'DEV')
+
+
+def choose_env(prod=None, dev=None):
+    value = {'PROD': prod, 'DEV': dev}[RUNTIME_ENV]
+    if callable(value):
+        return value()
+    return value
+
+
+DEBUG = choose_env(prod=False, dev=False)
 
 ALLOWED_HOSTS = ['*']
 
@@ -86,11 +96,11 @@ def read_secret(secret_name: str):
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': read_secret('postgres_user_name'),
-        'USER': read_secret('postgres_user_name'),
-        'PASSWORD': read_secret('postgres_password'),
-        'HOST': 'postgres',
-        'PORT': '5432',
+        'NAME': choose_env(prod=lambda: read_secret('postgres_user_name'), dev='test'),
+        'USER': choose_env(prod=lambda: read_secret('postgres_user_name'), dev='test'),
+        'PASSWORD': choose_env(prod=lambda: read_secret('postgres_password'), dev='test'),
+        'HOST': choose_env(prod='postgres', dev=''),
+        'PORT': choose_env(prod='5432', dev=''),
     }
 }
 
@@ -125,7 +135,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-EMAIL_BACKEND = 'post_office.EmailBackend'
+EMAIL_BACKEND = choose_env(prod='post_office.EmailBackend', dev='django.core.mail.backends.console.EmailBackend')
 
 LIBRARY_EMAIL = 'notification@library.ru'
 

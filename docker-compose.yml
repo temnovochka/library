@@ -35,6 +35,8 @@ services:
         secrets:
             - postgres_user_name
             - postgres_password
+        environment:
+            - RUNTIME_ENV=PROD
     redis:
         image: "redis:alpine"
     celery:
