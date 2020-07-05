@@ -23,4 +23,4 @@ class Author(Person):
 
 
 class Follower(Person):
-    email = models.EmailField(verbose_name='Электронный адрес')
+    email = models.EmailField(verbose_name='Электронный адрес', unique=True)
